@@ -12,6 +12,7 @@ install:
   - pip install lxml beautifulsoup4
 
 script:
+  - mkdir out/
   - wget http://openmensa.org/open-mensa-v2.xsd
   - python parser.py
   - for f in out/*.xml; do xmllint --noout $f --schema open-mensa-v2.xsd; done
