@@ -4,7 +4,7 @@ A Python script that converts canteen meal data from [Studentenwerk Münster](ht
 
 ## Configuration
 
-[`config.py`](config.py) contains a few settings that you can change, the most important being `output_dir` where the output data will be written to.
+[`config.py`](config.py) contains a few settings that you can change, the most important being `output_dir` where the output data will be written to. Make sure this folder exists before executing the script.
 
 ## Installation
 
