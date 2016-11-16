@@ -1,0 +1,17 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+
+sudo: required
+
+install: 
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libxml2-utils
+  - pip install lxml beautifulsoup4
+
+script:
+  - wget http://openmensa.org/open-mensa-v2.xsd
+  - python parser.py
+  - for f in out/*.xml; do xmllint --noout $f --schema open-mensa-v2.xsd; done

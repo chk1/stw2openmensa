@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import config
 import os
-import urllib2
+try:
+    import urllib2
+except ImportError:
+    import urllib.request as urllib2
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -49,7 +52,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 			om_meal_price2 = om_soup.new_tag('price', role='employee')
 			om_meal_price3 = om_soup.new_tag('price', role='other')
 
-			om_meal_name.string = st_item.meal.contents[0].encode('utf-8')
+			om_meal_name.string = st_item.meal.contents[0]
 			om_meal_note.string = ''
 			
 			price1 = st_item.price1.contents[0]
@@ -77,11 +80,11 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 			om_root.canteen.append(om_day)
 
 	with open('{}{}'.format(outputdir, filename), 'w') as out:
-		out.write(om_soup.encode('utf-8'))
+		out.write(str(om_soup))
 
 for file in config.canteen_files:
 	try:
-		print 'Processing "{}"'.format(file)
+		print('Processing "{}"'.format(file))
 		StudentenwerkToOpenmensa(config.base_url, config.out_dir, config.user_agent, file) 
 	except Exception as e:
-		print 'Conversion of "{}" failed: {}'.format(file, e)
+		print('Conversion of "{}" failed: {}'.format(file, e))
