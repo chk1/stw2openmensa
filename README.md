@@ -1,21 +1,23 @@
-# Studentenwerk Münster To OpenMensa
+# stw2openmensa
 
-Convert canteen meal data from Studentenwerk Münster XML to OpenMensa Feed v2 XML format
+A Python script that converts canteen meal data from [Studentenwerk Münster](http://studentenwerk-muenster.de/) XML to [OpenMensa Feed v2](http://doc.openmensa.org/feed/v2/) XML format.
 
-## Config
+## Configuration
 
-Change the output directory in parser.py line 82 if you want, goes to `./out/` by default.
+[`config.py`](config.py) contains a few settings that you can change, the most important being `output_dir` where the output data will be written to.
 
-## Install dependencies and Run
+## Installation
 
-Quick start:
+### Quick start
+
+Install dependencies and run the script.
 
 ```
 pip install beautifulsoup4 lxml
 python parser.py
 ```
 
-With virtualenv:
+### Using virtualenv
 
 ```
 sudo pip install virtualenv
@@ -26,8 +28,12 @@ python parser.py
 deactivate
 ```
 
-Cronjob ([see here](http://stackoverflow.com/a/3287063/1781026)):
+Cronjob example:
 
 ```
-0 0 * * * * /home/you/mensaparser/venv/bin/python /home/you/mensaparser/parser.py
+0 7 * * 1-6 /home/you/mensaparser/venv/bin/python /home/you/mensaparser/parser.py
 ```
+
+## Todo
+
+Check how canteen data looks when a canteen is closed and add necessary XML attributes.

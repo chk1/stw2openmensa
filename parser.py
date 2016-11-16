@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
+import config
 import os
-import stwcanteens
 import urllib2
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-def StudentenwerkToOpenmensa(outputdir, filename):
-	response = urllib2.urlopen('http://speiseplan.stw-muenster.de/{}'.format(filename))
-	mensaXml = response.read()
+def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
+	request = urllib2.Request('{}{}'.format(baseurl, filename))
+	request.add_header('User-Agent', user_agent)
+	opener = urllib2.build_opener()
+	mensaXml = opener.open(request).read()
 
 	# studentenwerk source document
 	st_soup = BeautifulSoup(mensaXml, 'lxml-xml')
 
 	# openmensa target document
-	om_soup = BeautifulSoup("", 'lxml-xml')
-	om_root = om_soup.new_tag("openmensa")
-	om_root['version'] = "2.1"
-	om_root['xmlns'] = "http://openmensa.org/open-mensa-v2"
-	om_root['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
-	om_root['xsi:schemaLocation'] = "http://openmensa.org/open-mensa-v2 http://openmensa.org/open-mensa-v2.xsd"
+	om_soup = BeautifulSoup('', 'lxml-xml')
+	om_root = om_soup.new_tag('openmensa')
+	om_root['version'] = '2.1'
+	om_root['xmlns'] = 'http://openmensa.org/open-mensa-v2'
+	om_root['xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'
+	om_root['xsi:schemaLocation'] = 'http://openmensa.org/open-mensa-v2 http://openmensa.org/open-mensa-v2.xsd'
 	om_soup.append(om_root)
 
-	om_root.append(om_soup.new_tag("canteen"))
+	om_root.append(om_soup.new_tag('canteen'))
 
 	st_menu = st_soup.menue
 	# print st_menu['location']
@@ -54,7 +56,7 @@ def StudentenwerkToOpenmensa(outputdir, filename):
 			price2 = st_item.price2.contents[0]
 			price3 = st_item.price3.contents[0]
 
-			# "tagesmenu" for vegan menu, discard entirely
+			# the vegan "Tagesmenu" has no prices, discard 
 			valid = False
 			if price1 != '-' or price2 != '-' or price3 != '-':
 				valid = True # hopefully...
@@ -63,6 +65,7 @@ def StudentenwerkToOpenmensa(outputdir, filename):
 				om_meal_price3.string = price3.replace(',', '.')
 
 				om_meal.append(om_meal_name)
+				# 'note' may be useful for listing food additives at some point, currently unused
 				# om_meal.append(om_meal_note)
 				om_meal.append(om_meal_price1)
 				om_meal.append(om_meal_price2)
@@ -76,9 +79,9 @@ def StudentenwerkToOpenmensa(outputdir, filename):
 	with open('{}{}'.format(outputdir, filename), 'w') as out:
 		out.write(om_soup.encode('utf-8'))
 
-for file in stwcanteens.CANTEENS:
+for file in config.canteen_files:
 	try:
 		print 'Processing "{}"'.format(file)
-		StudentenwerkToOpenmensa('out/', file) # trailing slash on the output directory
-	except Error as e:
+		StudentenwerkToOpenmensa(config.base_url, config.out_dir, config.user_agent, file) 
+	except Exception as e:
 		print 'Conversion of "{}" failed: {}'.format(file, e)
