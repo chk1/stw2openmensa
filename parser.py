@@ -55,6 +55,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	# print st_menu['location']
 	st_days = st_menu.find_all('date')
 	for st_day in st_days:
+		mealcounter = 0
 		date_day = datetime.fromtimestamp(int(st_day['timestamp'])).strftime('%Y-%m-%d')
 		
 		om_day = om_soup.new_tag('day', date=date_day)
@@ -83,9 +84,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 			price3 = st_item.price3.contents[0]
 
 			# the vegan "Tagesmenu" has no prices, discard 
-			valid = False
 			if price1 != '-' and price2 != '-' and price3 != '-':
-				valid = True # hopefully...
 				om_meal_price1.string = price1.replace(',', '.')
 				om_meal_price2.string = price2.replace(',', '.')
 				om_meal_price3.string = price3.replace(',', '.')
@@ -99,7 +98,8 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 
 				om_category.append(om_meal)
 				om_day.append(om_category)
-		if valid:
+				mealcounter = mealcounter+1
+		if mealcounter > 0:
 			om_root.canteen.append(om_day)
 
 	with open('{}{}'.format(outputdir, filename), 'w') as out:
