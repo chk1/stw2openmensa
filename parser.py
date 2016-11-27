@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import config
+import re
 import os
 try:
     import urllib2
@@ -7,6 +8,28 @@ except ImportError:
     import urllib.request as urllib2
 from bs4 import BeautifulSoup
 from datetime import datetime
+
+additives_expr = re.compile(r' \(((?:[0-9a-zA-Z]|10)(?:(?:,(?:[0-9a-zA-Z]|10))+)?)\)')
+
+def getNote(meal):
+	additive_brackets = additives_expr.findall(meal)
+	add_cat1=[] # Zusatzstoffe
+	add_cat2=[] # Allergene
+	additives_all = ','.join(additive_brackets)
+	additives_all = list(set(additives_all.split(',')))
+	for x in additives_all:
+		try:
+		    add_cat1.append(config.additives[x]) if x.isdigit() else add_cat2.append(config.additives[x])
+		except KeyError:
+			pass
+	result_string_array = []
+	if len(add_cat1) > 0:
+		cat1_str = 'Enthält Zusatzstoffe: {}'.format(', '.join(add_cat1))
+		result_string_array.append(cat1_str)
+	if len(add_cat2) > 0:
+		cat2_str = 'Enthält Allergene: {}'.format(', '.join(add_cat2))
+		result_string_array.append(cat2_str)
+	return '; '.join(result_string_array)
 
 def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	request = urllib2.Request('{}{}'.format(baseurl, filename))
@@ -52,8 +75,8 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 			om_meal_price2 = om_soup.new_tag('price', role='employee')
 			om_meal_price3 = om_soup.new_tag('price', role='other')
 
-			om_meal_name.string = st_item.meal.contents[0]
-			om_meal_note.string = ''
+			om_meal_name.string = additives_expr.sub('', st_item.meal.contents[0])
+			om_meal_note.string = getNote(st_item.meal.contents[0])
 			
 			price1 = st_item.price1.contents[0]
 			price2 = st_item.price2.contents[0]
@@ -61,15 +84,15 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 
 			# the vegan "Tagesmenu" has no prices, discard 
 			valid = False
-			if price1 != '-' or price2 != '-' or price3 != '-':
+			if price1 != '-' and price2 != '-' and price3 != '-':
 				valid = True # hopefully...
 				om_meal_price1.string = price1.replace(',', '.')
 				om_meal_price2.string = price2.replace(',', '.')
 				om_meal_price3.string = price3.replace(',', '.')
 
 				om_meal.append(om_meal_name)
-				# 'note' may be useful for listing food additives at some point, currently unused
-				# om_meal.append(om_meal_note)
+				if len(om_meal_note.string) > 0:
+					om_meal.append(om_meal_note)
 				om_meal.append(om_meal_price1)
 				om_meal.append(om_meal_price2)
 				om_meal.append(om_meal_price3)
@@ -82,9 +105,9 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	with open('{}{}'.format(outputdir, filename), 'w') as out:
 		out.write(str(om_soup))
 
-for file in config.canteen_files:
+for filename in config.canteen_files:
 	try:
-		print('Processing "{}"'.format(file))
-		StudentenwerkToOpenmensa(config.base_url, config.out_dir, config.user_agent, file) 
+		print('Processing "{}"'.format(filename))
+		StudentenwerkToOpenmensa(config.base_url, config.out_dir, config.user_agent, filename) 
 	except Exception as e:
-		print('Conversion of "{}" failed: {}'.format(file, e))
+		print('Conversion of "{}" failed: {}'.format(filename, e))
