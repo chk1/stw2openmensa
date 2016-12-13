@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-out_dir = './out/' # trailing slash required
-user_agent = 'stw2openmensa (https://github.com/chk1/stw2openmensa)'
+OUT_DIR = './out/' # trailing slash required
+USER_AGENT = 'stw2openmensa (https://github.com/chk1/stw2openmensa)'
 
-base_url = 'http://speiseplan.stw-muenster.de/'
-canteen_files = [
+BASE_URL = 'http://speiseplan.stw-muenster.de/'
+CANTEEN_FILES = [
 	'mensa_aasee.xml',
 	'mensa_am_ring.xml',
 	'mensa_bispinghof.xml',
@@ -18,7 +18,7 @@ canteen_files = [
 	'bistro_katho.xml',
 	'bistro_oeconomicum.xml'
 ]
-additives = {
+ADDITIVES = {
 	# Zusatzstoffe
 	'1': 'Farbstoff',
 	'2': 'Konservierungsstoff',
@@ -45,4 +45,14 @@ additives = {
 	'L': 'Lupinen',
 	'M': 'Weichtiere',
 	'N': 'Schwefeldioxid und Sulfite'
+}
+CLASSIFICATION = {
+	'Alk': 'Alkohol',
+	'Fis': 'Fisch',
+	'Gfl': 'Geflügel',
+	'Rin': 'Rind',
+	'Rnd': 'Rind',
+	'Sch': 'Schwein',
+	'Vgn': 'Vegan',
+	'Vgt': 'Vegetarisch'
 }

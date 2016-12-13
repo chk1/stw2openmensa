@@ -8,8 +8,11 @@ except ImportError:
     import urllib.request as urllib2
 from bs4 import BeautifulSoup
 from datetime import datetime
+import traceback
 
 additives_expr = re.compile(r' \(((?:[0-9a-zA-Z]|10)(?:(?:,(?:[0-9a-zA-Z]|10))+)?)\)')
+cleanup_expr   = re.compile(r'\s\s|\(\)|\r?\n')
+foodicons_expr = re.compile(r', ?')
 
 def getNote(meal):
 	additive_brackets = additives_expr.findall(meal)
@@ -19,7 +22,7 @@ def getNote(meal):
 	additives_all = list(set(additives_all.split(',')))
 	for x in additives_all:
 		try:
-		    add_cat1.append(config.additives[x]) if x.isdigit() else add_cat2.append(config.additives[x])
+		    add_cat1.append(config.ADDITIVES[x]) if x.isdigit() else add_cat2.append(config.ADDITIVES[x])
 		except KeyError:
 			pass
 	result_string_array = []
@@ -29,7 +32,15 @@ def getNote(meal):
 	if len(add_cat2) > 0:
 		cat2_str = 'Enthält Allergene: {}'.format(', '.join(add_cat2))
 		result_string_array.append(cat2_str)
-	return '; '.join(result_string_array)
+	return result_string_array
+
+def getFoodicon(fi):
+	fis = foodicons_expr.split(fi)
+	try:
+		fis = map(lambda x: config.CLASSIFICATION[x], fis)
+	except KeyError:
+		print "wew"
+	return fis
 
 def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	request = urllib2.Request('{}{}'.format(baseurl, filename))
@@ -63,51 +74,63 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 		# as of now, there is just one item in each category
 		st_items = st_day.find_all('item')
 		for st_item in st_items:
-			# surrounding tags for each meal, again, 1:1 for each meal/category/item
-			om_category = om_soup.new_tag('category')
-			om_category['name'] = st_item.category.contents[0]
+			# check for empty items
+			if st_item.category != None and st_item.price1 != None: 
+				# surrounding tags for each meal, again, 1:1 for each meal/category/item
+				om_category = om_soup.new_tag('category')
+				om_category['name'] = st_item.category.contents[0]
 
-			om_meal = om_soup.new_tag('meal')
+				om_meal = om_soup.new_tag('meal')
 
-			# meal attributes
-			om_meal_name = om_soup.new_tag('name')
-			om_meal_note = om_soup.new_tag('note')
-			om_meal_price1 = om_soup.new_tag('price', role='student')
-			om_meal_price2 = om_soup.new_tag('price', role='employee')
-			om_meal_price3 = om_soup.new_tag('price', role='other')
+				# meal attributes
+				om_meal_name = om_soup.new_tag('name')
+				om_meal_price1 = om_soup.new_tag('price', role='student')
+				om_meal_price2 = om_soup.new_tag('price', role='employee')
+				om_meal_price3 = om_soup.new_tag('price', role='other')
 
-			om_meal_name.string = additives_expr.sub('', st_item.meal.contents[0])
-			om_meal_note.string = getNote(st_item.meal.contents[0])
-			
-			price1 = st_item.price1.contents[0]
-			price2 = st_item.price2.contents[0]
-			price3 = st_item.price3.contents[0]
+				if st_item.foodicons != None and len(st_item.foodicons.contents) > 0:
+					foodicons = getFoodicon(st_item.foodicons.contents[0])
+					for foodicon in foodicons:
+						om_meal_note = om_soup.new_tag('note')
+						om_meal_note.string = foodicon
+						om_meal.append(om_meal_note)
 
-			# the vegan "Tagesmenu" has no prices, discard 
-			if price1 != '-' and price2 != '-' and price3 != '-':
-				om_meal_price1.string = price1.replace(',', '.')
-				om_meal_price2.string = price2.replace(',', '.')
-				om_meal_price3.string = price3.replace(',', '.')
-
-				om_meal.append(om_meal_name)
-				if len(om_meal_note.string) > 0:
+				om_meal_name.string = additives_expr.sub('', st_item.meal.contents[0])
+				om_meal_name.string = cleanup_expr.sub('', om_meal_name.string).strip()
+				additives = getNote(st_item.meal.contents[0])
+				for additive in additives:
+					om_meal_note = om_soup.new_tag('note')
+					om_meal_note.string = additive
 					om_meal.append(om_meal_note)
-				om_meal.append(om_meal_price1)
-				om_meal.append(om_meal_price2)
-				om_meal.append(om_meal_price3)
 
-				om_category.append(om_meal)
-				om_day.append(om_category)
-				mealcounter = mealcounter+1
-		if mealcounter > 0:
-			om_root.canteen.append(om_day)
+				price1 = st_item.price1.contents[0]
+				price2 = st_item.price2.contents[0]
+				price3 = st_item.price3.contents[0]
+
+				# the vegan "Tagesmenu" has no prices, discard 
+				if price1 != '-' and price2 != '-' and price3 != '-':
+					om_meal_price1.string = price1.replace(',', '.')
+					om_meal_price2.string = price2.replace(',', '.')
+					om_meal_price3.string = price3.replace(',', '.')
+
+					om_meal.append(om_meal_name)
+					om_meal.append(om_meal_price1)
+					om_meal.append(om_meal_price2)
+					om_meal.append(om_meal_price3)
+
+					om_category.append(om_meal)
+					om_day.append(om_category)
+					mealcounter = mealcounter+1
+			if mealcounter > 0:
+				om_root.canteen.append(om_day)
 
 	with open('{}{}'.format(outputdir, filename), 'w') as out:
 		out.write(str(om_soup))
 
-for filename in config.canteen_files:
+for filename in config.CANTEEN_FILES:
 	try:
 		print('Processing "{}"'.format(filename))
-		StudentenwerkToOpenmensa(config.base_url, config.out_dir, config.user_agent, filename) 
+		StudentenwerkToOpenmensa(config.BASE_URL, config.OUT_DIR, config.USER_AGENT, filename) 
 	except Exception as e:
 		print('Conversion of "{}" failed: {}'.format(filename, e))
+		traceback.print_exc()
