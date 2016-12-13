@@ -39,7 +39,7 @@ def getFoodicon(fi):
 	try:
 		fis = map(lambda x: config.CLASSIFICATION[x], fis)
 	except KeyError:
-		print "wew"
+		pass
 	return fis
 
 def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
@@ -88,6 +88,10 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 				om_meal_price2 = om_soup.new_tag('price', role='employee')
 				om_meal_price3 = om_soup.new_tag('price', role='other')
 
+				om_meal_name.string = additives_expr.sub('', st_item.meal.contents[0])
+				om_meal_name.string = cleanup_expr.sub('', om_meal_name.string).strip()
+				om_meal.append(om_meal_name)
+
 				if st_item.foodicons != None and len(st_item.foodicons.contents) > 0:
 					foodicons = getFoodicon(st_item.foodicons.contents[0])
 					for foodicon in foodicons:
@@ -95,8 +99,6 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 						om_meal_note.string = foodicon
 						om_meal.append(om_meal_note)
 
-				om_meal_name.string = additives_expr.sub('', st_item.meal.contents[0])
-				om_meal_name.string = cleanup_expr.sub('', om_meal_name.string).strip()
 				additives = getNote(st_item.meal.contents[0])
 				for additive in additives:
 					om_meal_note = om_soup.new_tag('note')
@@ -113,7 +115,6 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 					om_meal_price2.string = price2.replace(',', '.')
 					om_meal_price3.string = price3.replace(',', '.')
 
-					om_meal.append(om_meal_name)
 					om_meal.append(om_meal_price1)
 					om_meal.append(om_meal_price2)
 					om_meal.append(om_meal_price3)

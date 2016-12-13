@@ -2,4 +2,4 @@ out/
 venv/
 venv3/
 __pycache__/
-.pyc
+*.pyc
