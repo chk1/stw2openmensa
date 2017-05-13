@@ -10,8 +10,9 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import traceback
 
-additives_expr = re.compile(r' \(((?:[0-9a-zA-Z]|10)(?:(?:,(?:[0-9a-zA-Z]|10))+)?)\)')
-cleanup_expr   = re.compile(r'\s\s|\(\)|\r?\n')
+additives_expr = re.compile(r' ?\(((?:[0-9a-zA-Z]|10)(?:(?:,(?:[0-9a-zA-Z]|10))+)?)\)')
+cleanup_expr   = re.compile(r'\(\)|\r?\n')
+spaces_expr    = re.compile(r'\t|\s\s+')
 foodicons_expr = re.compile(r', ?')
 
 def getNote(meal):
@@ -89,6 +90,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 				om_meal_price3 = om_soup.new_tag('price', role='other')
 
 				om_meal_name.string = additives_expr.sub('', st_item.meal.contents[0])
+				om_meal_name.string = spaces_expr.sub(' ', om_meal_name.string)
 				om_meal_name.string = cleanup_expr.sub('', om_meal_name.string).strip()
 				om_meal.append(om_meal_name)
 
@@ -122,6 +124,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 					om_category.append(om_meal)
 					om_day.append(om_category)
 					mealcounter = mealcounter+1
+
 			if mealcounter > 0:
 				om_root.canteen.append(om_day)
 
