@@ -55,5 +55,6 @@ CLASSIFICATION = {
 	'rnd': 'Rind',
 	'sch': 'Schwein',
 	'vgn': 'Vegan',
-	'vgt': 'Vegetarisch'
+	'vgt': 'Vegetarisch',
+	'veg': 'Vegetarisch'
 }
