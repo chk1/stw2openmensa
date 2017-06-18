@@ -13,22 +13,31 @@ A Python script that converts canteen meal data from [Studierendenwerk Münster]
 Install dependencies and run the script.
 
 ```
-pip install beautifulsoup4 lxml
+pip install -r requirements.txt
 python parser.py
 ```
 
 ### Using virtualenv
 
+Prepare your virtual environment:
 ```
 sudo pip install virtualenv
 virtualenv venv
 source venv/bin/activate
-pip install beautifulsoup4 lxml
+pip install -r requirements.txt
+deactivate
+```
+
+Activate your virtual environment and run the parser:
+```
+source venv/bin/activate
 python parser.py
 deactivate
 ```
 
 Cronjob example using `virtualenv`:
+
+Executes monday through saturday at 07:00
 
 ```
 0 7 * * 1-6 /home/you/mensaparser/venv/bin/python /home/you/mensaparser/parser.py
@@ -40,7 +49,7 @@ Original meal data is available from Studierendenwerk Münster as XML, see [the 
 
 Revised and parsed XML data for OpenMensa is available from [mensa.chrk.de/openmensa](https://mensa.chrk.de/openmensa). This is where I configured my OpenMensa sources to fetch canteen data from ([see map of canteens](http://openmensa.org/#14/51.9646/7.6159)). Data is parsed and updated daily.
 
-JSON data is available from the OpenMensa API via `http://openmensa.org/api/v2/canteens/225/meals`.
+JSON data is available from the [OpenMensa API](http://doc.openmensa.org/api/v2/) via e.g. `http://openmensa.org/api/v2/canteens/225/meals`.
 
 ID `225` represents "Mensa am Ring", you can use these other IDs as well:
 
