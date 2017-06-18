@@ -47,12 +47,13 @@ ADDITIVES = {
 	'N': 'Schwefeldioxid und Sulfite'
 }
 CLASSIFICATION = {
-	'Alk': 'Alkohol',
-	'Fis': 'Fisch',
-	'Gfl': 'Geflügel',
-	'Rin': 'Rind',
-	'Rnd': 'Rind',
-	'Sch': 'Schwein',
-	'Vgn': 'Vegan',
-	'Vgt': 'Vegetarisch'
+	'alk': 'Alkohol',
+	'fis': 'Fisch',
+	'gfl': 'Geflügel',
+	'gefl': 'Geflügel',
+	'rin': 'Rind',
+	'rnd': 'Rind',
+	'sch': 'Schwein',
+	'vgn': 'Vegan',
+	'vgt': 'Vegetarisch'
 }

@@ -38,7 +38,7 @@ def getNote(meal):
 def getFoodicon(fi):
 	fis = foodicons_expr.split(fi)
 	try:
-		fis = map(lambda x: config.CLASSIFICATION[x], fis)
+		fis = map(lambda x: config.CLASSIFICATION[x.lower()], fis)
 	except KeyError:
 		pass
 	return fis
@@ -48,6 +48,9 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	request.add_header('User-Agent', user_agent)
 	opener = urllib2.build_opener()
 	mensaXml = opener.open(request).read()
+
+	#with open('{}{}'.format("in/", filename), 'w') as out:
+	#	out.write(str(mensaXml))
 
 	# studentenwerk source document
 	st_soup = BeautifulSoup(mensaXml, 'lxml-xml')
@@ -100,6 +103,15 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 					om_meal_name.string = cleanup_expr.sub('', om_meal_name.string).strip()
 					om_meal.append(om_meal_name)
 
+					""" 
+					"food icons" - Meal classification 
+					
+					Meal classificatins are signified using colored icons on the STW website, apps 
+					and public screens.
+
+					In the OpenMensa XML we will put the classification it in a <note> tag instead,
+					i.e. "rin" -> Rind, "vgt" -> Vegetarisch
+					"""
 					if st_item.foodicons != None and len(st_item.foodicons.contents) > 0:
 						foodicons = getFoodicon(st_item.foodicons.contents[0])
 						for foodicon in foodicons:
