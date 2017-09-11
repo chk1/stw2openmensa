@@ -70,6 +70,10 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	# print st_menu['location']
 	st_days = st_menu.find_all('date')
 	for st_day in st_days:
+		# canteen might not have any data
+		if not st_day.has_attr('timestamp') or st_day['timestamp'] == '':
+			continue
+
 		mealcounter = 0
 		date_day = datetime.fromtimestamp(int(st_day['timestamp'])).strftime('%Y-%m-%d')
 		
