@@ -169,7 +169,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 						mealcounter = mealcounter+1
 						closed_today = False
 
-			if not closed_today:
+			if not closed_today and mealcounter > 0:
 				om_root.canteen.append(om_day)
 
 		# If there are no meals and there is the word "geschlossen" somewhere in the meal's text
