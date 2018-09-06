@@ -44,7 +44,9 @@ ADDITIVES = {
 	'K': 'Sesam',
 	'L': 'Lupinen',
 	'M': 'Weichtiere',
-	'N': 'Schwefeldioxid und Sulfite'
+	'N': 'Schwefeldioxid und Sulfite',
+	# Other
+	'Alk': 'Alkohol'
 }
 CLASSIFICATION = {
 	'alk': 'Alkohol',

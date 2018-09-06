@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import config
 import re
 import os
@@ -10,12 +11,22 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import traceback
 
-additives_expr = re.compile(r' ?\(((?:[0-9a-zA-Z]|10)(?:(?:,(?:[0-9a-zA-Z]|10))+)?)\)')
+additives_expr = re.compile(r' ?\(((?:[0-9a-zA-Z]|10|Alk)(?:(?:[,;](?:[0-9a-zA-Z]|10|Alk))+)?,?)\)')
 cleanup_expr   = re.compile(r'\(\)|\r?\n')
 spaces_expr    = re.compile(r'\t|\s\s+')
 foodicons_expr = re.compile(r', ?')
 
 def getNote(meal):
+	"""
+	Meal names contain numbers and letters in parenthesis for declaring additives 
+	and warnings for substances that might cause allergic reactions.
+
+	This function parses that information and returns a "human readable" list of ingredients
+	which will be inserted in a <note> tag in the resulting XML.
+
+	Example: "(A,B,C,1,2)"
+	Expected result: "Enthält Zusatzstoffe: <list>"
+	"""
 	additive_brackets = additives_expr.findall(meal)
 	add_cat1=[] # Zusatzstoffe
 	add_cat2=[] # Allergene
@@ -36,6 +47,13 @@ def getNote(meal):
 	return result_string_array
 
 def getFoodicon(fi):
+	"""
+	The "foodicons" XML tag depicts a category for a meal, 
+	it contains one or more (comma separated) abbreviations for each category
+
+	Example: "<foodicons>Gfl, Alk</foodicons>"
+	Expected result: "Geflügel, Alkohol"
+	"""
 	fis = foodicons_expr.split(fi)
 	try:
 		fis = map(lambda x: config.CLASSIFICATION[x.lower()], fis)
@@ -49,18 +67,19 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	opener = urllib2.build_opener()
 	mensaXml = opener.open(request).read()
 
+	# Use for debugging: write input files to a folder
 	#with open('{}{}'.format("in/", filename), 'w') as out:
 	#	out.write(str(mensaXml))
 
-	# studentenwerk source document
+	# Studentenwerk source document prefix "st_"
 	st_soup = BeautifulSoup(mensaXml, 'lxml-xml')
 
-	# openmensa target document
+	# OpenMensa target document prefix "om_"
 	om_soup = BeautifulSoup('', 'lxml-xml')
 	om_root = om_soup.new_tag('openmensa')
-	om_root['version'] = '2.1'
-	om_root['xmlns'] = 'http://openmensa.org/open-mensa-v2'
-	om_root['xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'
+	om_root['version']            = '2.1'
+	om_root['xmlns']              = 'http://openmensa.org/open-mensa-v2'
+	om_root['xmlns:xsi']          = 'http://www.w3.org/2001/XMLSchema-instance'
 	om_root['xsi:schemaLocation'] = 'http://openmensa.org/open-mensa-v2 http://openmensa.org/open-mensa-v2.xsd'
 	om_soup.append(om_root)
 
@@ -70,7 +89,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 	# print st_menu['location']
 	st_days = st_menu.find_all('date')
 	for st_day in st_days:
-		# canteen might not have any data
+		# canteen might not have any data, skip
 		if not st_day.has_attr('timestamp') or st_day['timestamp'] == '':
 			continue
 
@@ -80,18 +99,19 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 		om_day = om_soup.new_tag('day', date=date_day)
 		closed_today = False
 
-		# as of now, there is just one item in each category
+		# As of now, there is just one item in each category
+		# e.g. <item><category>Tagesgericht 1</category> ... </item>
 		st_items = st_day.find_all('item')
 		for st_item in st_items:
 
-			# check for empty items
+			# Check for empty items
 			if st_item.category != None and st_item.price1 != None: 
-				# surrounding tags for each meal, again, 1:1 for each meal/category/item
+				# Create surrounding tags for each meal, again, 1:1 for each meal/category/item
 				om_category = om_soup.new_tag('category')
 				om_category['name'] = st_item.category.contents[0]
 
 				if (st_item.category.contents[0].strip() == "Info"
-				    and st_item.meal.contents[0].strip() == "Geschlossen"):
+				    and "geschlossen" in st_item.meal.contents[0].lower()):
 					closed_today = True
 				else:
 					om_meal = om_soup.new_tag('meal')
@@ -114,7 +134,7 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 					and public screens.
 
 					In the OpenMensa XML we will put the classification it in a <note> tag instead,
-					i.e. "rin" -> Rind, "vgt" -> Vegetarisch
+					i.e. "rin" -> Rind, "vgt" -> Vegetarisch etc.
 					"""
 					if st_item.foodicons != None and len(st_item.foodicons.contents) > 0:
 						foodicons = getFoodicon(st_item.foodicons.contents[0])
@@ -133,7 +153,8 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 					price2 = st_item.price2.contents[0]
 					price3 = st_item.price3.contents[0]
 
-					# the vegan "Tagesmenu" has no prices, discard 
+					# Discard items with no price (for example, often times vegan "Tagesmenu")
+					# because it doesn't fit in the XML model
 					if price1 != '-' and price2 != '-' and price3 != '-':
 						om_meal_price1.string = price1.replace(',', '.')
 						om_meal_price2.string = price2.replace(',', '.')
@@ -146,21 +167,31 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 						om_category.append(om_meal)
 						om_day.append(om_category)
 						mealcounter = mealcounter+1
+						closed_today = False
 
-			if not closed_today and mealcounter > 0:
-				om_root.canteen.append(om_day)
-			elif closed_today:
-				om_closed = om_soup.new_tag('closed')
-				om_day.append(om_closed)
+			if not closed_today:
 				om_root.canteen.append(om_day)
 
-	with open('{}{}'.format(outputdir, filename), 'w') as out:
+		# If there are no meals and there is the word "geschlossen" somewhere in the meal's text
+		# add a <closed/> tag for the day
+		if mealcounter == 0 and closed_today:
+			om_closed = om_soup.new_tag('closed')
+			om_day.append(om_closed)
+			om_root.canteen.append(om_day)
+
+	with open(os.path.join(outputdir, filename), 'w') as out:
 		out.write(str(om_soup))
+	return "ok"
 
-for filename in config.CANTEEN_FILES:
-	try:
-		print('Processing "{}"'.format(filename))
-		StudentenwerkToOpenmensa(config.BASE_URL, config.OUT_DIR, config.USER_AGENT, filename) 
-	except Exception as e:
-		print('Conversion of "{}" failed: {}'.format(filename, e))
-		traceback.print_exc()
+if __name__ == "__main__":
+	if not os.path.isdir(config.OUT_DIR):
+		raise Exception("The output folder {} does not exist. please check your configuration file.".format(config.OUT_DIR))
+
+	for filename in config.CANTEEN_FILES:
+		try:
+			print('Processing "{}" '.format(filename), end='')
+			status = StudentenwerkToOpenmensa(config.BASE_URL, config.OUT_DIR, config.USER_AGENT, filename) 
+			print(status)
+		except Exception as e:
+			print('Conversion of "{}" failed: {}'.format(filename, e))
+			traceback.print_exc()
