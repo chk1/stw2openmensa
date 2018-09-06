@@ -18,8 +18,7 @@ foodicons_expr = re.compile(r', ?')
 
 def getNote(meal):
 	"""
-	Meal names contain numbers and letters in parenthesis for declaring additives 
-	and warnings for substances that might cause allergic reactions.
+	Meal names contain numbers and letters in parenthesis for declaring additives and allergenics
 
 	This function parses that information and returns a "human readable" list of ingredients
 	which will be inserted in a <note> tag in the resulting XML.
@@ -30,11 +29,21 @@ def getNote(meal):
 	additive_brackets = additives_expr.findall(meal)
 	add_cat1=[] # Zusatzstoffe
 	add_cat2=[] # Allergene
+	add_cat3=[] # Alkohol
 	additives_all = ','.join(additive_brackets)
 	additives_all = list(set(additives_all.split(',')))
 	for x in additives_all:
 		try:
-		    add_cat1.append(config.ADDITIVES[x]) if x.isdigit() else add_cat2.append(config.ADDITIVES[x])
+			# Sort into categories:
+			# Numbers: additives
+			# Letters: allergenics
+			# Special case: Alk - Alkohol
+			if x.isdigit():
+				add_cat1.append(config.ADDITIVES[x])
+			elif x.lower() == "alk":
+				add_cat3.append(config.ADDITIVES[x])
+			else: 
+				add_cat2.append(config.ADDITIVES[x])
 		except KeyError:
 			pass
 	result_string_array = []
@@ -44,6 +53,8 @@ def getNote(meal):
 	if len(add_cat2) > 0:
 		cat2_str = 'Enthält Allergene: {}'.format(', '.join(add_cat2))
 		result_string_array.append(cat2_str)
+	if len(add_cat3) > 0:
+		result_string_array.append(add_cat3[0])
 	return result_string_array
 
 def getFoodicon(fi):
