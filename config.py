@@ -9,11 +9,12 @@ CANTEEN_FILES = [
 	'mensa_bispinghof.xml',
 	'mensa_da_vinci.xml',
 	'mensa_steinfurt.xml',
-	'bistro_coerdehof.xml',
+	#'bistro_coerdehof.xml',
 	'bistro_denkpause.xml',
 	'bistro_durchblick.xml',
 	'bistro_frieden.xml',
-	'bistro_huefferstift.xml',
+	'bistro_friesenring.xml',
+	#'bistro_huefferstift.xml',
 	'bistro_kabu.xml',
 	'bistro_katho.xml',
 	'bistro_oeconomicum.xml'
@@ -28,7 +29,7 @@ ADDITIVES = {
 	'6': 'geschwärzt',
 	'7': 'gewachst',
 	'8': 'Phosphat',
-	'9': 'Süßungsmitteln',
+	'9': 'Süßungsmittel',
 	'10': 'eine Phenylalaninquelle',
 	# Allergene
 	'A': 'glutenhaltiges Getreide',
