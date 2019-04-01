@@ -2,7 +2,7 @@
 
 This is a Python script that converts canteen meal data from [Studierendenwerk Münster](https://www.stw-muenster.de/) XML to [OpenMensa Feed v2](http://doc.openmensa.org/feed/v2/) XML format.
 
-The Studierendenwerk Münster provides meal data as XML files, see [the discussion here](https://github.com/ifgi-webteam/mensaparser/issues/4#issuecomment-260331519).
+Studierendenwerk Münster provides meal data as XML files, see [the discussion here](https://github.com/ifgi-webteam/mensaparser/issues/4#issuecomment-260331519).
 
 ## Installation
 
@@ -51,7 +51,7 @@ Executes monday through saturday at 07:00
 
 Revised and parsed XML data for OpenMensa is available from [mensa.chrk.de/openmensa](https://mensa.chrk.de/openmensa). 
 
-I configured OpenMensa sources for Münster's canteens already, you can see ([a map of canteens here](http://openmensa.org/#14/51.9646/7.6159)). Data is parsed and updated daily.
+I configured OpenMensa sources for Münster's canteens already, you can see [a map of canteens here](http://openmensa.org/#14/51.9646/7.6159). Data is parsed and updated daily.
 
 ### JSON format
 
@@ -61,11 +61,12 @@ ID `225` represents "Mensa am Ring", you can use these other IDs as well:
 
 |OpenMensa ID | Link to OpenMensa Website            |
 |-------------|--------------------------------------|
-|`325`        | [Bistro Coerdehof][325]              |
+|`325`        | ~~[Bistro Coerdehof][325]~~ ([geschlossen](https://github.com/chk1/stw2openmensa/issues/2)) |
 |`227`        | [Bistro Denkpause][227]              |
 |`326`        | [Bistro Durchblick][326]             |
 |`327`        | [Bistro Frieden][327]                |
-|`328`        | [Bistro Hüfferstift][328]            |
+|`872`        | [Bistro Friesenring][872]            |
+|`328`        | ~~[Bistro Hüfferstift][328]~~ ([geschlossen](https://github.com/chk1/stw2openmensa/issues/2)) |
 |`329`        | [Bistro KaBu][329]                   |
 |`330`        | [Bistro Katholische Hochschule][330] |
 |`331`        | [Bistro Oeconomicum][331]            |
@@ -76,19 +77,20 @@ ID `225` represents "Mensa am Ring", you can use these other IDs as well:
 |`332`        | [Mensa Steinfurt][332]               |
 
 
-[325]: http://openmensa.org/c/325
-[227]: http://openmensa.org/c/227
-[326]: http://openmensa.org/c/326
-[327]: http://openmensa.org/c/327
-[328]: http://openmensa.org/c/328
-[329]: http://openmensa.org/c/329
-[330]: http://openmensa.org/c/330
-[331]: http://openmensa.org/c/331
-[226]: http://openmensa.org/c/226
-[225]: http://openmensa.org/c/225
-[233]: http://openmensa.org/c/233
-[228]: http://openmensa.org/c/228
-[332]: http://openmensa.org/c/332
+[325]: https://openmensa.org/c/325
+[227]: https://openmensa.org/c/227
+[326]: https://openmensa.org/c/326
+[327]: https://openmensa.org/c/327
+[328]: https://openmensa.org/c/328
+[329]: https://openmensa.org/c/329
+[330]: https://openmensa.org/c/330
+[331]: https://openmensa.org/c/331
+[226]: https://openmensa.org/c/226
+[225]: https://openmensa.org/c/225
+[233]: https://openmensa.org/c/233
+[228]: https://openmensa.org/c/228
+[332]: https://openmensa.org/c/332
+[872]: https://openmensa.org/c/872
 
 ## Todo
 
@@ -96,4 +98,4 @@ ID `225` represents "Mensa am Ring", you can use these other IDs as well:
 
 ## License
 
-MIT
+Code in this repository is licensed under the [MIT license](LICENSE).
