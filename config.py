@@ -58,5 +58,6 @@ CLASSIFICATION = {
 	'sch': 'Schwein',
 	'vgn': 'Vegan',
 	'vgt': 'Vegetarisch',
-	'veg': 'Vegetarisch'
+	'veg': 'Vegetarisch',
+	'bio': 'Bioprodukte'
 }
