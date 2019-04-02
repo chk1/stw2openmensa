@@ -192,12 +192,16 @@ def StudentenwerkToOpenmensa(baseurl, outputdir, user_agent, filename):
 
 	with open(os.path.join(outputdir, filename), 'w') as out:
 		out.write(str(om_soup))
-	return "ok"
+	return 'ok'
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	if not os.path.isdir(config.OUT_DIR):
-		raise Exception("The output folder {} does not exist. please check your configuration file.".format(config.OUT_DIR))
-
+		print('The output directory {} does not exist. Creating it.'.format(config.OUT_DIR))
+		os.makedirs(config.OUT_DIR)
+		if os.path.isdir(config.OUT_DIR):
+			print('Output directory has been created.')
+		else:
+			raise Exception('Error creating output directory. Please create it manually and rerun the parser.')
 	for filename in config.CANTEEN_FILES:
 		try:
 			print('Processing "{}" '.format(filename), end='')

@@ -8,7 +8,7 @@ Studierendenwerk Münster provides meal data as XML files, see [the discussion h
 
 ### Configuration
 
-[`config.py`](config.py) contains a few settings that you can change, the most important being `output_dir` where the output data will be written to. Make sure this folder exists before executing the script.
+[`config.py`](config.py) contains a few settings that you can change, the most important being `output_dir` where the output data will be written to.
 
 ### Quick start
 
@@ -49,7 +49,7 @@ Executes monday through saturday at 07:00
 
 ### OpenMensa Feed v2 XML format
 
-Revised and parsed XML data for OpenMensa is available from [mensa.chrk.de/openmensa](https://mensa.chrk.de/openmensa). 
+Revised and parsed XML data for OpenMensa is available from [mensa.chrk.de/openmensa](https://mensa.chrk.de/openmensa).
 
 I configured OpenMensa sources for Münster's canteens already, you can see [a map of canteens here](http://openmensa.org/#14/51.9646/7.6159). Data is parsed and updated daily.
 
