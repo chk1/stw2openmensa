@@ -67,7 +67,7 @@ def getFoodicon(fi):
 	"""
 	fis = foodicons_expr.split(fi)
 	try:
-		fis = map(lambda x: config.CLASSIFICATION[x.lower()], fis)
+		fis = map(lambda x: config.CLASSIFICATION[x.strip().lower()], fis)
 	except KeyError:
 		pass
 	return fis
