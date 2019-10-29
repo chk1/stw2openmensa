@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import traceback
 
-additives_expr = re.compile(r' ?\(((?:[0-9a-zA-Z]|10|Alk)(?:(?:[,;\.](?:[0-9a-zA-Z]|10|Alk))+)?,?)\)')
+additives_expr = re.compile(r' ?\(((?:[0-9a-zA-Z]|[A-Z]{3}|10|Alk)(?:(?:[,;\.](?:[0-9a-zA-Z]|[A-Z]{3}|10|Alk))+)?,?)\)')
 cleanup_expr   = re.compile(r'\(\)|\r?\n')
 spaces_expr    = re.compile(r'\t|\s\s+')
 foodicons_expr = re.compile(r', ?')
