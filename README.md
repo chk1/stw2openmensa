@@ -1,8 +1,14 @@
 # stw2openmensa
 
-This is a Python script that converts canteen meal data from [Studierendenwerk Münster](https://www.stw-muenster.de/) XML to [OpenMensa Feed v2](http://doc.openmensa.org/feed/v2/) XML format.
+## Deprecation notice
 
-~~Studierendenwerk Münster provides meal data as XML files, see [the discussion here](https://github.com/ifgi-webteam/mensaparser/issues/4#issuecomment-260331519).~~ As of August 2020 Studierendenwerk Münster no longer provides meal data in XML format (see [issue #15](https://github.com/chk1/stw2openmensa/issues/15)).
+From 2016 to August 2020, Studierendenwerk Münster provided meal data as XML files (see [the discussion here](https://github.com/ifgi-webteam/mensaparser/issues/4#issuecomment-260331519)) but they have since stopped. Canteen data is now only available via the "My Mensa" platform.
+
+If want to use the canteen data in a machine readable format and are looking for an alternative, take a look at the [mymensa2openmensa](https://gitlab.com/BBurke/mymensa2openmensa) project (see [issue #15](https://github.com/chk1/stw2openmensa/issues/15)).
+
+## About
+
+stw2openmensa is a Python script that converts canteen meal data from [Studierendenwerk Münster](https://www.stw-muenster.de/) XML to [OpenMensa Feed v2](http://doc.openmensa.org/feed/v2/) XML format.
 
 ## Installation
 
@@ -45,13 +51,9 @@ Executes monday through saturday at 07:00
 0 7 * * 1-6 /home/you/mensaparser/venv/bin/python /home/you/mensaparser/parser.py
 ```
 
-## Data access
-
-As of August 2020 converted and parsed data is no longer available from OpenMensa, since Studierendenwerk Münster hast stopped providing the source XML files.
-
 ## Todo
 
-* Better checks for when a canteen is closed for the day
+* Better checks for when a canteen is closed for the day (see issue #4)
 
 ## License
 
